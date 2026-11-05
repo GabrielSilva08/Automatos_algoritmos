@@ -1,5 +1,7 @@
 class DFA:
-    """Autômato Finito Determinístico (Deterministic Finite Automaton) dado pela definição clássica (Q, Σ, δ, q0, F).
+    """Autômato Finito Determinístico (Deterministic Finite Automaton) dado pela definição clássica (Q, Σ, δ, q0, F). A tabela de transição não precisa configurar um autômato completo,
+    estados onde não se tenha todos os símbolos do alfabeto definidos são assumidos levarem a um estado sumidouro (trap state). Mas, o autômato deve está normalizado, ou seja, todos
+    os estados são alcançáveis por alguma palavra definida sobre o alfabeto.
     """
     def __init__(self,
                  states_set: set[str],
@@ -7,14 +9,14 @@ class DFA:
                  transition_table: dict[tuple[str, str|int], str],
                  initial_state: str,
                  final_states_set: set[str]):
-        """ Método construtor da classe.
+        """Método construtor da classe.
 
         Args:
             states_set (set[str]): Conjunto não vazio de estados.
             alphabet (set[str | int]): Alfabeto na qual o autômato irá operar. Ex: Σ = {a, b}.
-            transition_table (dict[tuple[str, str | int], str]): Tabela de transição.
-            initial_state (str): Estado inicial, "q0".
-            final_states (set[str]): Conjunto de estados finais. final_states ⊆ states_set.
+            transition_table (dict[tuple[str, str | int], str]): Tabela de transição. Estrutura responsável por modelar a função de transição δ : Q × Σ → Q.
+            initial_state (str): Estado inicial. Ex: "q0".
+            final_states (set[str]): Conjunto de estados finais, onde final_states ⊆ states_set.
         """
         self.states_set = states_set
         self.alphabet = alphabet
@@ -23,8 +25,13 @@ class DFA:
         self.final_states_set = final_states_set
         self._validate()
 
-    def __str__(self):
-        return f"DFA({self.states_set}, {self.alphabet}, {self.transition_table}, {self.initial_state}, {self.final_states_set})"
+    def __repr__(self) -> str:
+        """Representação do autômato para fins de depuração.
+
+        Returns:
+            str: Tupla contendo os elementos internos do DFA.
+        """
+        return f"DFA(Q = {self.states_set},\nΣ = {self.alphabet},\nδ = {self.transition_table},\nq0 = {self.initial_state},\nF = {self.final_states_set})"
 
     def eval(self, word: str) -> bool:
         """ Verifica se a palavra "word" faz parte da linguagem do autômato.
@@ -36,7 +43,7 @@ class DFA:
             bool: True se word ∈ L(M), False caso contrário.
         """
         if not self._check_word_in_alphabet(word):
-            raise ValueError(f"word {word} contains symbols that is not in the automaton's alphabet.")
+            raise ValueError(f"word '{word}' contains symbols that is not in the automaton's alphabet.")
         current_state = self.initial_state
         for symbol in word:
             current_state = self.transition_table.get((current_state, symbol), None)
@@ -66,13 +73,13 @@ class DFA:
         pass
 
     def _validate(self):
-        """Realiza uma série de verificações para garantir que a definição do DFA seja consistente.
+        """Realiza uma série de verificações para garantir que os argumentos passados no consturtor formem um DFA consistente.
         """
         if not self.states_set:
             raise ValueError("The set of states cannot be empty.")
         
         if self.initial_state not in self.states_set:
-                raise ValueError("The initial state must belong to the set of states.")
+            raise ValueError("The initial state must belong to the set of states.")
         
         if not (self.final_states_set <= self.states_set):
             raise ValueError("Final states must belong to the set of states.")
