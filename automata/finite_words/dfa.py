@@ -73,7 +73,7 @@ class DFA:
         pass
 
     def _validate(self):
-        """Realiza uma série de verificações para garantir que os argumentos passados no consturtor formem um DFA consistente.
+        """Realiza uma série de verificações para garantir que os argumentos passados no construtor formem um DFA consistente.
         """
         if not self.states_set:
             raise ValueError("The set of states cannot be empty.")
